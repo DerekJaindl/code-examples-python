@@ -1,65 +1,49 @@
 """Example 042: Use embedded signing with CFR Part 11"""
 
-from docusign_esign.client.api_exception import ApiException
-from flask import render_template, request, Blueprint, current_app as app, session
+import os
+import json
+from datetime import datetime
+from flask import Flask, request, render_template, jsonify
+from docusign_esign import ApiClient, EnvelopesApi
+from ds_config import DS_CONFIG
 
-from ..examples.list_status_changes import worker
-from ...docusign import authenticate, ensure_manifest, get_example_by_number
-from ...ds_config import DS_CONFIG
-from ...error_handlers import process_error
-from ...consts import API_TYPE
+app = Flask(__name__)
 
-example_number = 42  # Change this to a new example number
-api = API_TYPE["ESIGNATURE"]
-eg = f"eg0{example_number}"  # reference (and url) for this example
-eg042 = Blueprint(eg, __name__)
-
-@eg042.route(f"/{eg}", methods=["POST"])
-@ensure_manifest(manifest_url=DS_CONFIG["example_manifest_url"])
-@authenticate(eg=eg, api=api)
-def list_status_changes():
-    """
-    1. Get required arguments
-    2. Call the worker method
-    3. Render the results
-    """
-    try:
-        # 1. Get required arguments
-        from_date = request.form.get("from_date")
-        to_date = request.form.get("to_date")
-        status = request.form.get("status")
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        from_date = request.form['from_date']
+        to_date = request.form['to_date']
+        status = request.form['status']
 
         if not from_date:
             return "Missing 'from_date' parameter", 400
 
-        args = {
-            "account_id": session["ds_account_id"],
-            "base_path": session["ds_base_path"],
-            "ds_access_token": session["ds_access_token"],
-        }
+        results = list_status_changes(from_date, to_date, status)
+        return jsonify(results)
+    return render_template('index.html')
 
-        # 2. Call the worker method
-        results = worker(from_date=from_date, to_date=to_date, status=status, args=args)
 
-    except ApiException as err:
-        return process_error(err)
+def list_status_changes(from_date, to_date=None, status=None):
+    api_client = ApiClient()
+    api_client.host = DS_CONFIG['base_path']
+    api_client.set_default_header("Authorization", f"Bearer {DS_CONFIG['access_token']}")
+    envelope_api = EnvelopesApi(api_client)
 
-    # 3. Render the results
-    return render_template("eSignature/eg042_list_status_changes.html", results=results)
+    from_date_iso = datetime.fromisoformat(from_date).isoformat()
+    query_params = {'from_date': from_date_iso}
 
-@eg042.route(f"/{eg}", methods=["GET"])
-@ensure_manifest(manifest_url=DS_CONFIG["example_manifest_url"])
-@authenticate(eg=eg, api=api)
-def get_view():
-    """responds with the form for the example"""
-    example = get_example_by_number(session["manifest"], example_number, api)
-    return render_template(
-        "eSignature/eg042_list_status_changes.html",
-        title=example["ExampleName"],
-        example=example,
-        source_file="list_status_changes.py",
-        source_url=DS_CONFIG["github_example_url"] + "list_status_changes.py",
-        documentation=DS_CONFIG["documentation"] + eg,
-        show_doc=DS_CONFIG["documentation"],
-    )
+    if to_date:
+        to_date_iso = datetime.fromisoformat(to_date).isoformat()
+        query_params['to_date'] = to_date_iso
+
+    if status:
+        query_params['status'] = status
+
+    results = envelope_api.list_status_changes(DS_CONFIG['account_id'], **query_params)
+    return results.to_dict()
+
+
+if __name__ == "__main__":
+    app.run()
 
