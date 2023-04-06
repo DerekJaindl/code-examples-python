@@ -1,0 +1,32 @@
+<!-- extend base layout --> {% extends "base.html" %}  {% block content %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Envelope Download</title>
+  </head>
+  <body>
+    <h1>Download Envelope Data</h1>
+    <form action="/download" method="post">
+      <label for="from_date">From Date:</label>
+      <input type="date" id="from_date" name="from_date" required><br>
+      <label for="to_date">To Date:</label>
+      <input type="date" id="to_date" name="to_date" required><br>
+      <label for="status">Status:</label>
+      <select id="status" name="status" required>
+        <option value="completed">Completed</option>
+        <option value="created">Created</option>
+        <option value="declined">Declined</option>
+        <option value="sent">Sent</option>
+        <option value="voided">Voided</option>
+      </select><br>
+      <label for="account_id">Account ID:</label>
+      <input type="text" id="account_id" name="account_id" required><br>
+      <input type="submit" value="Download">
+    </form>
+  </body>
+</html>
+
+  
+{% endblock %}
