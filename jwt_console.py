@@ -12,7 +12,7 @@ from app.jwt_config import DS_JWT
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'docusign_esign'])
 
 SCOPES = [
-    "signature", "impersonation"
+    "signature"
 ]
 
 
@@ -20,7 +20,7 @@ def get_consent_url():
     url_scopes = "+".join(SCOPES)
 
     # Construct consent URL
-    redirect_uri = "https://developers.docusign.com/platform/auth/consent"
+    redirect_uri = "http://localhost/auth_redirect"
     consent_url = f"https://{DS_JWT['authorization_server']}/oauth/auth?response_type=code&" \
                   f"scope={url_scopes}&client_id={DS_JWT['ds_client_id']}&redirect_uri={redirect_uri}"
 
