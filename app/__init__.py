@@ -13,6 +13,7 @@ from .monitor import views as monitor_views
 from .admin import views as admin_views
 from .views import core
 
+
 session_path = "/tmp/python_recipe_sessions"
 app = Flask(__name__)
 
@@ -104,6 +105,8 @@ app.register_blueprint(esignature_views.eg038)
 app.register_blueprint(esignature_views.eg039)
 app.register_blueprint(esignature_views.eg040)
 app.register_blueprint(esignature_views.eg041)
+app.register_blueprint(esignature_views.eg042_envelopesListStatusChanges.eg042)
+
 
 if "DYNO" in os.environ:  # On Heroku?
     import logging

@@ -6,11 +6,11 @@
   "env": {
       "DS_OAUTH_CLIENT_ID": {
         "required": false,
-        "description": "Optional: your OAuth client_id (Integration Key)."
+        "description": "5493cc14-5c18-49d1-b352-8893c1d9fa65"
       },
       "DS_OAUTH_SECRET": {
         "required": false,
-        "description": "Optional: your OAuth secret. You must add an OAuth redirect uri of <server>/auth_redirect"
+        "description": "http://localhost/auth_redirect"
       }
   }
 }
