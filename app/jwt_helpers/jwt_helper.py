@@ -20,7 +20,7 @@ def get_private_key(private_key_path):
     Check that the private key present in the file and if it is, get it from the file.
     In the opposite way get it from config variable.
     """
-    private_key_file = path.abspath("C:\Python311\Lib\site-packages\LegalIT\DocuSign-Python\app\private.key")
+    private_key_file = path.abspath(private_key_path)
 
     if path.isfile(private_key_file):
         with open(private_key_file) as private_key_file:
